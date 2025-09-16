@@ -1,0 +1,68 @@
+Artificial Intelligence is the new electricity.
+Deep learning is a subset of machine learning inspired by the human brain.
+Transformers revolutionized natural language processing by using self-attention.
+Large Language Models are trained on massive datasets to predict the next token.
+Attention is all you need was a breakthrough paper by Vaswani et al. in 2017.
+Generative AI can create text, images, music, and even code.
+Prompt engineering helps guide AI models to produce better outputs.
+Reinforcement learning with human feedback improves alignment of AI systems.
+Fine-tuning allows adapting a pre-trained model to a specific task or domain.
+OpenAI GPT models are based on decoder-only transformers.
+Tokenization is the process of breaking text into smaller pieces before feeding to the model.
+Self-attention lets every token look at every other token in the sequence.
+Positional encoding helps transformers understand word order.
+AI safety ensures that powerful models behave in a way that is beneficial to humans.
+Few-shot learning enables models to generalize from very few examples.
+Generative AI is transforming industries like healthcare, finance, and education.
+Vector embeddings are used to represent meaning of words and sentences in numerical form.
+Machine learning is about finding patterns in data and making predictions.
+Training a neural network involves forward pass, loss computation, and backpropagation.
+AI models must be evaluated for fairness, robustness, and explainability.
+Scaling laws show that bigger models trained on more data perform better.
+Attention heads allow models to focus on different parts of a sentence simultaneously.
+AI ethics is about making sure AI respects human rights and avoids bias.
+Transformer blocks consist of multi-head attention and feedforward layers.
+Layer normalization stabilizes training and improves convergence.
+Residual connections help gradients flow better in deep networks.
+Dropout prevents overfitting by randomly deactivating neurons.
+Feedforward networks apply nonlinear transformations to hidden states.
+Temperature controls randomness during text generation.
+Top-p sampling limits selection to a subset of probable tokens.
+Context length determines how much history the model can use.
+Causal masking ensures tokens only see previous tokens.
+Token embeddings convert words to continuous vectors.
+Sequence length must be consistent with positional embeddings.
+Learning rate schedules help stabilize training.
+Optimizers like Adam improve convergence speed.
+Beam search improves generation quality.
+Masked language modeling helps train bidirectional models.
+Decoder-only models use causal attention for generation.
+Layer weights are initialized before training starts.
+Gradient clipping prevents exploding gradients.
+Early stopping halts training if validation loss stagnizes.
+Model checkpoints save progress periodically.
+Text generation predicts one character at a time.
+Softmax converts logits into probabilities.
+Cross-entropy loss measures prediction error.
+Backpropagation updates model weights using gradients.
+Training involves multiple epochs over the dataset.
+Evaluation measures model performance on unseen data.
+Preprocessing cleans text for consistent tokenization.
+Random batches allow stochastic gradient descent.
+Embedding dimension controls token vector size.
+Number of heads affects multi-head attention capacity.
+Number of layers determines model depth.
+GELU is a nonlinear activation used in feedforward layers.
+Sequence-to-sequence models map input sequences to outputs.
+Attention maps relationships between all tokens.
+Positional encodings are either sinusoidal or learned.
+Text sampling creates novel sequences from trained models.
+Neural networks generalize patterns in data.
+Loss curves visualize training progress over time.
+Model reproducibility ensures consistent results.
+Char-level LMs predict one character at a time.
+Vocabulary size defines the total number of tokens.
+Self-supervised learning uses raw text without labels.
+Gradient descent iteratively reduces training loss.
+Training steps define the number of iterations.
+Model convergence occurs when loss stabilizes.
