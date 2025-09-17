@@ -1,6 +1,7 @@
 import torch
 import torch.nn.functional as F
 
+
 def scaled_dot_product_attention(Q, K, V, mask=None, causal=False):
     """
     Q, K, V : (..., seq_len, d_k)
@@ -8,11 +9,13 @@ def scaled_dot_product_attention(Q, K, V, mask=None, causal=False):
     causal: if True, apply causal mask
     """
     d_k = Q.size(-1)
-    scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k ** 0.5)
+    scores = torch.matmul(Q, K.transpose(-2, -1)) / (d_k**0.5)
 
     if causal:
         seq = scores.size(-1)
-        causal_mask = torch.triu(torch.ones(seq, seq, dtype=torch.bool, device=scores.device), diagonal=1)
+        causal_mask = torch.triu(
+            torch.ones(seq, seq, dtype=torch.bool, device=scores.device), diagonal=1
+        )
         scores = scores.masked_fill(causal_mask, float("-inf"))
 
     if mask is not None:

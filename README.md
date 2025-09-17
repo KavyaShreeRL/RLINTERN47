@@ -1,30 +1,49 @@
-# Attention Assignment - Character-Level Transformer
+# Assignment 01 – From Attention to a Tiny Transformer
 
-## Overview
-This project implements a **character-level language model (CharLM)** using a **Transformer architecture**. It demonstrates:
+##  Objective
+Build a mini Transformer from scratch and train it as a character-level language model.  
+Understand how 'Attention is All You Need' works under the hood and practice engineering hygiene.
 
-- Token-level text generation.
-- Multi-head self-attention.
-- Positional encoding (and ablation study without it).
-- Bits-per-character (BPC) evaluation.
+###  Goals
+- Implement scaled dot-product attention and multi-head attention.
+- Add positional encodings (sinusoidal and learned).
+- Build a Transformer block and character-level LM.
+- Train, evaluate, and generate text.
+- Compare baseline vs ablation (remove positional encoding, reduce heads).
+- Maintain clean code, testing, and reproducibility.
 
 ---
 
-## Folder Structure
+##  Project Structure
 
-attention-assignments/
-├─ data/ 
-│ └─ tiny.txt
-├─ experiments/
-│ ├─ train1_charlm.py 
-│ ├─ generate.py 
-│ ├─ eval.py 
+Attention-assignment - 01/
 ├─ src/
-│ ├─ transformer_block.py
+│ ├─ attention_numpy.py
+│ ├─ attention_torch.py
+│ ├─ mha.py
 │ ├─ positional_encoding.py
-├─ checkpoints/ # Saved model checkpoints
-├─ train_val_loss_curve.png
-├─ loss_history.json
-├─ README.md
+│ ├─ transformer_block.py
+├─ experiments/
+│ ├─ train_charlm.py
+│ ├─ generate.py
+│ ├─ eval.py
+├─ data/
+│ └─ tiny.txt
+├─ tests/
+│ ├─ test_attention.py
+│ ├─ test_mha.py
+│ ├─ test_positional.py
+│ ├─ test_block.py
+├─ checkpoints/
 ├─ REPORT.md
-└─ repro.md
+├─ REPRO.md
+├─ requirements.txt
+
+
+
+
+
+
+
+
+

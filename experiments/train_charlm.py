@@ -6,9 +6,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from src.transformer_block import TransformerBlock
-from src.positional_encoding import LearnedPositionalEncoding, sinusoidal_positional_encoding
+from src.positional_encoding import (
+    LearnedPositionalEncoding,
+    sinusoidal_positional_encoding,
+)
 from experiments.eval import evaluate, load_data  # reuse validation logic
-
 
 
 def load_text(data_path):
@@ -19,9 +21,19 @@ def load_text(data_path):
     encoded = torch.tensor([stoi[c] for c in text], dtype=torch.long)
     return text, encoded, stoi, itos, len(chars)
 
+
 class CharLM(nn.Module):
-    def __init__(self, vocab_size, d_model, n_heads, n_layers, seq_len, mlp_mult=4,
-                 learned_pos=False, use_pos_encoding=True):
+    def __init__(
+        self,
+        vocab_size,
+        d_model,
+        n_heads,
+        n_layers,
+        seq_len,
+        mlp_mult=4,
+        learned_pos=False,
+        use_pos_encoding=True,
+    ):
         super().__init__()
         self.seq_len = seq_len
         self.d_model = d_model
@@ -39,7 +51,9 @@ class CharLM(nn.Module):
                     self.pos_embedding.weight.copy_(pe)
 
         mlp_dim = d_model * mlp_mult
-        self.layers = nn.ModuleList([TransformerBlock(d_model, n_heads, mlp_dim) for _ in range(n_layers)])
+        self.layers = nn.ModuleList(
+            [TransformerBlock(d_model, n_heads, mlp_dim) for _ in range(n_layers)]
+        )
         self.ln = nn.LayerNorm(d_model)
         self.fc = nn.Linear(d_model, vocab_size)
 
@@ -54,12 +68,16 @@ class CharLM(nn.Module):
         x = self.ln(x)
         return self.fc(x)
 
+
 def save_checkpoint(path, model, optimizer, meta):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    payload = {"model_state": model.state_dict(),
-               "optim_state": optimizer.state_dict(),
-               "meta": meta}
+    payload = {
+        "model_state": model.state_dict(),
+        "optim_state": optimizer.state_dict(),
+        "meta": meta,
+    }
     torch.save(payload, path)
+
 
 def load_checkpoint(path, model, optimizer=None, map_location="cpu"):
     payload = torch.load(path, map_location=map_location)
@@ -68,27 +86,32 @@ def load_checkpoint(path, model, optimizer=None, map_location="cpu"):
         optimizer.load_state_dict(payload["optim_state"])
     return payload.get("meta", {})
 
+
 def get_batch(encoded, seq_len, batch_size, device):
     max_start = len(encoded) - seq_len - 1
     if max_start <= 0:
         raise ValueError("Dataset too small for seq_len.")
     starts = torch.randint(0, max_start, (batch_size,))
-    x = torch.stack([encoded[s:s+seq_len] for s in starts]).to(device)
-    y = torch.stack([encoded[s+1:s+seq_len+1] for s in starts]).to(device)
+    x = torch.stack([encoded[s : s + seq_len] for s in starts]).to(device)
+    y = torch.stack([encoded[s + 1 : s + seq_len + 1] for s in starts]).to(device)
     return x, y
+
 
 @torch.no_grad()
 def generate_text(model, start_text, length, stoi, itos, device):
     model.eval()
-    idx = torch.tensor([stoi[c] for c in start_text], dtype=torch.long, device=device).unsqueeze(0)
+    idx = torch.tensor(
+        [stoi[c] for c in start_text], dtype=torch.long, device=device
+    ).unsqueeze(0)
     generated = start_text
     for _ in range(length):
-        logits = model(idx[:, -model.seq_len:])
+        logits = model(idx[:, -model.seq_len :])
         next_idx = torch.argmax(logits[:, -1, :], dim=-1)
         next_char = itos[next_idx.item()]
         generated += next_char
         idx = torch.cat([idx, next_idx.unsqueeze(0)], dim=1)
     return generated
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -100,16 +123,29 @@ def main():
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=3e-4)
     parser.add_argument("--max_steps", type=int, default=2000)
-    parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu"
+    )
     parser.add_argument("--learned_pos", action="store_true")
-    parser.add_argument("--no_pos_encoding", action="store_true", help="Disable positional encoding for ablation study")
+    parser.add_argument(
+        "--no_pos_encoding",
+        action="store_true",
+        help="Disable positional encoding for ablation study",
+    )
     args = parser.parse_args()
 
     text, encoded, stoi, itos, vocab_size = load_text(args.data)
     device = args.device
 
-    model = CharLM(vocab_size, args.d_model, args.n_heads, args.n_layers, args.seq_len,
-                   learned_pos=args.learned_pos, use_pos_encoding=not args.no_pos_encoding).to(device)
+    model = CharLM(
+        vocab_size,
+        args.d_model,
+        args.n_heads,
+        args.n_layers,
+        args.seq_len,
+        learned_pos=args.learned_pos,
+        use_pos_encoding=not args.no_pos_encoding,
+    ).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr)
 
     losses = []
@@ -129,17 +165,31 @@ def main():
         losses.append(loss.item())
         if step % val_interval == 0 and step > 0:
             encoded_val, stoi_val, itos_val, vocab_size_eval = load_data(args.data)
-            val_loss, _ = evaluate(model, encoded_val, args.seq_len, vocab_size_eval, device)
+            val_loss, _ = evaluate(
+                model, encoded_val, args.seq_len, vocab_size_eval, device
+            )
             val_losses.append(val_loss)
-            print(f"Step {step} | Train Loss: {loss.item():.4f} | Val Loss: {val_loss:.4f}")
+            print(
+                f"Step {step} | Train Loss: {loss.item():.4f} | Val Loss: {val_loss:.4f}"
+            )
 
         if step % 200 == 0 and step > 0:
-            meta = {"seq_len": args.seq_len, "d_model": args.d_model, "n_heads": args.n_heads,
-                    "n_layers": args.n_layers, "use_pos_encoding": not args.no_pos_encoding}
+            meta = {
+                "seq_len": args.seq_len,
+                "d_model": args.d_model,
+                "n_heads": args.n_heads,
+                "n_layers": args.n_layers,
+                "use_pos_encoding": not args.no_pos_encoding,
+            }
             save_checkpoint("checkpoints/last.pt", model, optimizer, meta)
 
-    meta = {"seq_len": args.seq_len, "d_model": args.d_model, "n_heads": args.n_heads,
-            "n_layers": args.n_layers, "use_pos_encoding": not args.no_pos_encoding}
+    meta = {
+        "seq_len": args.seq_len,
+        "d_model": args.d_model,
+        "n_heads": args.n_heads,
+        "n_layers": args.n_layers,
+        "use_pos_encoding": not args.no_pos_encoding,
+    }
     save_checkpoint("checkpoints/last.pt", model, optimizer, meta)
     print("Training complete. Model saved to checkpoints/last.pt")
 
@@ -159,8 +209,11 @@ def main():
     plt.savefig("train_val_loss_curve.png")
     print("Saved training/validation loss curve to train_val_loss_curve.png")
 
-    sample_text = generate_text(model, start_text="The ", length=200, stoi=stoi, itos=itos, device=device)
+    sample_text = generate_text(
+        model, start_text="The ", length=200, stoi=stoi, itos=itos, device=device
+    )
     print("\nGenerated sample:\n", sample_text)
+
 
 if __name__ == "__main__":
     main()

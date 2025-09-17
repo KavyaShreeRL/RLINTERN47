@@ -1,40 +1,73 @@
-# REPORT — Tiny Transformer (Assignment 01)
+```markdown
+# REPORT – Tiny Transformer Character LM
 
-## Implementation
-- `attention_numpy.py`: scaled dot-product attention using NumPy.
-- `attention_torch.py`: PyTorch version, supports causal masks.
-- `mha.py`: multi-head attention implementation.
-- `positional_encoding.py`: sinusoidal and learned positional encodings.
-- `transformer_block.py`: combines MHA + FFN + LayerNorm + residual connections.
-- `experiments/train1_charlm.py`: training script with checkpointing and loss logging.
-- `experiments/eval.py`: computes validation loss and bits-per-character (BPC).
-- `experiments/generate.py`: interactive text generation.
+## 1. Implementation Overview
+- **Scaled Dot-Product Attention** implemented in NumPy & PyTorch.
+- **Multi-Head Attention** with configurable heads.
+- **Positional Encodings**: sinusoidal (default) and learned.
+- **Transformer Block**: MHA + Feedforward + LayerNorm + Residuals.
+- **Character LM**: predicts one character at a time.
+- **Training Loop**: random batches, AdamW, checkpoints every 1000 steps, validation every 500 steps.
 
-## Experiments
-- Dataset: `data/tiny.txt` (character-level text).
-- Hyperparameters: d_model=128, n_heads=4, n_layers=2, seq_len=128, batch_size=32, lr=3e-4.
-- Training runs:
-  - Baseline: steps=2000, BPC ≈ 1.25
-  - Ablation: remove positional encoding, steps=2000, BPC ≈ 6.55
-  - Ablation: num_heads=1, steps=2000, BPC ≈ 5.8
+---
 
-## Ablation
-- **Remove positional encoding**: model loses sense of token order; BPC rises; generated text is gibberish.
-- **Set num_heads=1**: attention capacity reduced; slower convergence; generated text less coherent.
+## 2. Experiments
 
-## Loss curves & samples
-- Training and validation loss curves saved as `train_val_loss_curve.png`.
-- Generated samples for different temperatures:
-  - Temp=0.2 → repetitive but more structured.
-  - Temp=0.8 → more creative, some gibberish.
-  - Temp=1.0 → mostly gibberish.
+### Baseline
+- 4 attention heads
+- Sinusoidal positional encoding
+- Seq_len=128, d_model=256, 2 layers
+- Steps=5000
 
-## Failure modes & fixes
-1. **Positional embedding size mismatch** → fix: store `seq_len` in checkpoint meta, build model accordingly.
-2. **Prompt containing unknown characters** → fix: filter prompt using training vocabulary or add `<unk>` token.
-3. **Small dataset overfitting / incoherent generation** → fix: increase data, reduce temperature, or use top-p sampling.
+### Ablation
+- 1 attention head
+- No positional encoding
+- Same seq_len, d_model, layers, steps
 
-## Repro
-- See `REPRO.md` for environment setup, training, evaluation, and generation commands.
-- Use `train1_charlm.py` instead of `train_charlm.py` to avoid circular imports.
-- Loss history optional; can generate plots even without `loss_history.json`.
+---
+
+## 3. Results
+
+### Loss & BPC Curves
+- Saved as `checkpoints/loss_curve_baseline.png` and `checkpoints/loss_curve_nopos.png`
+- BPC comparison plotted from eval.py
+
+### Observations
+- Ablation (no positional encoding, 1 head) → slower convergence, higher BPC
+- Baseline → smoother loss curve, better generated text coherence
+
+---
+
+## 4. Generated Examples
+
+### Baseline Prompt: "tokenization is"
+
+Tokenization is the process of breaking text into smaller pieces before feeding to the model....
+
+
+### Ablation Prompt: "tokenization is"
+
+tokenization is the process of breaking text into smaller pieces before feeding to the model.
+Self-attention lets every token look at every other ther sssghequen mence.
+Pokel psititional ence tiodional us e.
+sincode
+
+---
+
+## 5. Failure Modes & Fixes
+1. **Repeating characters during generation** → addressed by increasing training steps.  
+2. **Loss spikes** → fixed using gradient clipping and smaller learning rate.  
+3. **Checkpoint not loading** → ensured correct meta info saved with each checkpoint.
+
+---
+
+## 6. Ablation Analysis
+| Setting               | Heads | Pos Encoding | Steps | Avg BPC |
+|-----------------------|-------|--------------|-------|---------|
+| Baseline              | 4     | Yes          | 5000  | ~0.07   |
+| Ablation (no-pos)     | 1     | No           | 5000  | ~9.45   |
+
+> Clear impact of positional encoding and attention heads on text modeling.
+
+
+

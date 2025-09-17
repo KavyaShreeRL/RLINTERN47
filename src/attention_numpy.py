@@ -1,8 +1,10 @@
 import numpy as np
 
+
 def softmax(x, axis=-1):
     e = np.exp(x - np.max(x, axis=axis, keepdims=True))
     return e / np.sum(e, axis=axis, keepdims=True)
+
 
 def scaled_dot_product_attention(Q, K, V, mask=None, causal=False):
     """
@@ -12,7 +14,7 @@ def scaled_dot_product_attention(Q, K, V, mask=None, causal=False):
     returns: (out, attn_weights)
     """
     d_k = Q.shape[-1]
-    scores = np.matmul(Q, K.transpose(0,2,1)) / np.sqrt(d_k)
+    scores = np.matmul(Q, K.transpose(0, 2, 1)) / np.sqrt(d_k)
 
     if causal:
         L = scores.shape[-2]
@@ -20,7 +22,7 @@ def scaled_dot_product_attention(Q, K, V, mask=None, causal=False):
         scores = np.where(causal_mask[None, :, :], -1e9, scores)
 
     if mask is not None:
-        
+
         scores = np.where(mask == 0, -1e9, scores)
 
     weights = softmax(scores, axis=-1)
